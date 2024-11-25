@@ -126,7 +126,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Login</string>
+     <string>Create Account</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="password">
