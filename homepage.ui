@@ -209,7 +209,7 @@ padding: 4px;
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-137</y>
+         <y>-100</y>
          <width>364</width>
          <height>525</height>
         </rect>
@@ -400,6 +400,11 @@ font: 24pt &quot;MV Boli&quot;;</string>
              <bold>true</bold>
             </font>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton:hover {
+            background:  rgb(170, 0, 0);
+}</string>
+           </property>
            <property name="text">
             <string>Halloween Party</string>
            </property>
@@ -574,7 +579,7 @@ font: 24pt &quot;MV Boli&quot;;</string>
              <x>20</x>
              <y>10</y>
              <width>161</width>
-             <height>51</height>
+             <height>41</height>
             </rect>
            </property>
            <property name="palette">
@@ -701,6 +706,11 @@ font: 24pt &quot;MV Boli&quot;;</string>
              <pointsize>14</pointsize>
              <bold>true</bold>
             </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton:hover {
+            background:  rgb(170, 0, 0);
+}</string>
            </property>
            <property name="text">
             <string>Game Night</string>
@@ -1040,6 +1050,11 @@ font: 24pt &quot;MV Boli&quot;;</string>
              <bold>true</bold>
             </font>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton:hover {
+            background:  rgb(170, 0, 0);
+}</string>
+           </property>
            <property name="text">
             <string>Movie Night</string>
            </property>
@@ -1378,6 +1393,11 @@ font: 24pt &quot;MV Boli&quot;;</string>
              <bold>true</bold>
             </font>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton:hover {
+            background:  rgb(170, 0, 0);
+}</string>
+           </property>
            <property name="text">
             <string>Costume Party</string>
            </property>
@@ -1625,12 +1645,17 @@ border:0;</string>
           <enum>Qt::FocusPolicy::StrongFocus</enum>
          </property>
          <property name="styleSheet">
-          <string notr="true">border: 10;
+          <string notr="true">QPushButton {
+border: 10;
 border-radius: 56;
 border-color: grey;
 color: red;
 font: 16pt &quot;MV Boli&quot;;
-background: white;</string>
+background: white;
+}
+QPushButton:hover {
+            background: rgb(0, 0, 127);
+}</string>
          </property>
          <property name="text">
           <string>Create Event</string>
@@ -1663,12 +1688,17 @@ background: white;</string>
           </font>
          </property>
          <property name="styleSheet">
-          <string notr="true">border: 10;
+          <string notr="true">QPushButton {
+border: 10;
 border-radius: 56;
 border-color: grey;
 color: red;
 font: 16pt &quot;MV Boli&quot;;
-background: white;</string>
+background: white;
+}
+QPushButton:hover {
+            background: rgb(0, 0, 127);
+}</string>
          </property>
          <property name="text">
           <string>Invites</string>
