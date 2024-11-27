@@ -323,7 +323,7 @@ DELIMITER $$
 USE `meetup`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `list_all_hosted_events_for_user`(IN userID VARCHAR(8))
 BEGIN
-	SELECT eventName, eventDay, eventTime FROM event e 
+	SELECT eventID, eventName, eventDay, eventTime FROM event e 
 		JOIN user u ON e.userID=u.userID
 	WHERE u.userID=userID
 	ORDER BY eventName, eventDay, eventTime ASC;
@@ -339,10 +339,26 @@ DELIMITER $$
 USE `meetup`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `list_all_invited_to_events`(IN userID VARCHAR(8))
 BEGIN
-	SELECT eventName, eventDay, eventTime FROM event e 
+	SELECT eventID, eventName, eventDay, eventTime FROM event e 
 		JOIN invitedto i ON e.eventID=i.eventID
 	WHERE i.userID=userID
-	ORDER BY eventDay, eventTime ASC;
+	ORDER BY eventName, eventDay, eventTime ASC;
+END$$
+
+DELIMITER ;
+
+-- -----------------------------------------------------
+-- procedure list_all_invitedto_and_hosted_events
+-- -----------------------------------------------------
+
+DELIMITER $$
+USE `meetup`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `list_all_invitedto_and_hosted_events`(IN userID VARCHAR(8))
+BEGIN
+	SELECT eventID, eventName, eventDay, eventTime FROM event e 
+		JOIN invitedto i ON e.eventID=i.eventID
+	WHERE i.userID=userID AND e.userID=userID
+	ORDER BY eventName, eventDay, eventTime ASC;
 END$$
 
 DELIMITER ;
