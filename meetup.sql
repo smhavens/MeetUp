@@ -214,6 +214,20 @@ END$$
 DELIMITER ;
 
 -- -----------------------------------------------------
+-- procedure create_user
+-- -----------------------------------------------------
+
+DELIMITER $$
+USE `meetup`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_user`(IN uID VARCHAR(8), IN fName VARCHAR(15), IN lName VARCHAR(15), IN e VARCHAR(20), IN p VARCHAR(15), IN pass VARCHAR(25))
+BEGIN
+	INSERT INTO user(userID, firstName, lastName, email, phone, password)
+    VALUES(uID, fName, lName, e, p, pass);
+END$$
+
+DELIMITER ;
+
+-- -----------------------------------------------------
 -- function event_cost
 -- -----------------------------------------------------
 
