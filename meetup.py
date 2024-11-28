@@ -4,6 +4,8 @@ from pythonUI.ui_loginCreate import Ui_MainWindow
 from pythonUI.ui_login import Ui_LoginWindow
 from pythonUI.ui_homepage import Ui_HomepageWindow
 from pythonUI.ui_createAccount import Ui_CreateUserWindow
+from pythonUI.ui_createEvent import Ui_CreateEventWindow
+from pythonUI.ui_invites import Ui_InviteWindow
 import mysql.connector
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
@@ -133,6 +135,7 @@ class HomepageWindow(QMainWindow):
         self.ui_homepage.setupUi(self)
         self.scrollArea = self.ui_homepage.scrollAreaWidgetContents
         self.ui_homepage.actionLogout.triggered.connect(lambda: logout(self))
+        self.ui_homepage.pushButton.clicked.connect(self.open_new_event)
         
         query = """CALL list_all_invitedto_and_hosted_events(%s)"""
         mycursor.execute(query, (username,), multi=True)
@@ -140,7 +143,14 @@ class HomepageWindow(QMainWindow):
             allEvents = result.fetchall()  # Fetch rows for the current result set
             for event in allEvents:
                 print(event)
-        
+    
+    
+    def open_new_event(self):
+        self.hide()
+        self.ui_newEvent = CreateEventWindow()
+        self.ui_newEvent.show()
+    
+    
     def myEvents(self, name, day, time, id):
         self.newGroup = QGroupBox(self.scrollArea)
         # self.groupEventHalloween = QGroupBox(self.scrollAreaWidgetContents)
@@ -220,6 +230,100 @@ class HomepageWindow(QMainWindow):
         # self.groupEvent_2.setTitle(QCoreApplication.translate("MainWindow", u"GroupBox", None))
         # self.event_halloween_2.setText(QCoreApplication.translate("MainWindow", u"Game Night", None))
         # self.label_2.setText(QCoreApplication.translate("MainWindow", u"11/05", None))
+
+
+class CreateEventWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        global username
+        # Set up the second UI
+        self.ui_createEvent = Ui_CreateEventWindow()
+        self.ui_createEvent.setupUi(self)
+        self.invitees = []
+        self.ui_createEvent.submitButton.clicked.connect(self.submit_event)
+        self.ui_createEvent.inputUsername.returnPressed.connect(self.add_invitee)
+        
+    def submit_event(self):
+        #test
+        self.eventID = self.ui_createEvent.inputEventID.text()
+        self.eventName = self.ui_createEvent.nameInput.text()
+        self.eventDate = self.ui_createEvent.dateInput.date().toString("yyyy-MM-dd")
+        self.eventStart = self.ui_createEvent.timeStart.time().toString("HH:mm:ss")
+        self.eventEnd = self.ui_createEvent.timeEnd.time().toString("HH:mm:ss")
+        self.budget = self.ui_createEvent.inputBudget.value()
+        
+        if self.valid_eventID():
+            query = "CALL create_event(%s, %s, %s, %s, %f, %s)"
+            mycursor.execute(query, (self.eventID, self.eventName, self.eventDate, self.eventStart, self.budget, username))
+            while mycursor.nextset():
+                pass
+            
+            self.hide()
+            self.ui_home = HomepageWindow()
+            self.ui_home.show()
+        else:
+            self.ui_createEvent.eventIDError.setStyleSheet("color: red;")
+    
+    def add_invitee(self):
+        # Get the username from the input field
+        print("Attempting to add Invitee")
+        invitee = self.ui_createEvent.inputUsername.text()
+        self.ui_createEvent.inputUsername.setText('')
+        
+        query = """SELECT * FROM user WHERE userID = %s;"""
+        mycursor.execute(query, (invitee,))
+        valid = mycursor.fetchone()
+        while mycursor.nextset():
+            pass
+
+        if not valid and invitee and invitee not in self.invitees:
+            print("valid Invitee")
+            # Add the username to the list
+            self.invitees.append(invitee)
+            buttonName = u"pushButton" + invitee
+            # Create a button for the invitee
+            self.pushButton = QPushButton(self.inviteList)
+            self.pushButton.setObjectName(buttonName)
+            sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+            sizePolicy1.setHorizontalStretch(0)
+            sizePolicy1.setVerticalStretch(0)
+            sizePolicy1.setHeightForWidth(self.groupEventHalloween.sizePolicy().hasHeightForWidth())
+            sizePolicy1.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
+            self.pushButton.setSizePolicy(sizePolicy1)
+            self.pushButton.setMinimumSize(QSize(125, 0))
+            self.pushButton.setAutoFillBackground(False)
+            self.pushButton.setStyleSheet(u"QPushButton {\n"
+                                            "border: 10;\n"
+                                            "border-radius: 11;\n"
+                                            "border-color: grey;\n"
+                                            "color: white;\n"
+                                            "font: 16pt \"MV Boli\";\n"
+                                            "background: rgb(0, 170, 255);\n"
+                                            "}\n"
+                                            "\n"
+                                            "QPushButton:hover {\n"
+                                            "background: rgb(0, 0, 127);\n"
+                                            "}")
+            self.gridLayout.addWidget(self.pushButton, 0, 0, 1, 1)
+            button = QPushButton(invitee, self)
+            button.clicked.connect(lambda: print(f"{invitee} clicked!"))
+
+            # # Add the button to the layout
+            # self.invitees_layout.addWidget(button)
+
+            # # Clear the input field
+            # self.username_input.clear()
+
+            print("Current Invitees:", self.invitees)  # Debugging output
+    
+    def valid_eventID(self):
+        query = """SELECT * FROM event WHERE eventID = %s;"""
+        mycursor.execute(query, (self.eventID,))
+        valid = mycursor.fetchone()
+        while mycursor.nextset():
+            pass
+        
+        return not valid
 
 
 def logout(current_page):
