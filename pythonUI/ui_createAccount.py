@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'createAccountyAhHTY.ui'
+## Form generated from reading UI file 'createAccountyKAUei.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.0
 ##
@@ -11,13 +11,14 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
 from PySide6.QtWidgets import (QApplication, QLabel, QLineEdit, QMainWindow,
-    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
-    QWidget)
+    QMenu, QMenuBar, QPushButton, QSizePolicy,
+    QStatusBar, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -34,6 +35,10 @@ class Ui_MainWindow(object):
         palette.setBrush(QPalette.Disabled, QPalette.Base, brush)
         palette.setBrush(QPalette.Disabled, QPalette.Window, brush)
         MainWindow.setPalette(palette)
+        self.actionHome = QAction(MainWindow)
+        self.actionHome.setObjectName(u"actionHome")
+        self.actionLogout = QAction(MainWindow)
+        self.actionLogout.setObjectName(u"actionLogout")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.label_2 = QLabel(self.centralwidget)
@@ -99,10 +104,17 @@ class Ui_MainWindow(object):
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 800, 33))
+        self.menubar.setAutoFillBackground(True)
+        self.menuHome = QMenu(self.menubar)
+        self.menuHome.setObjectName(u"menuHome")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.menubar.addAction(self.menuHome.menuAction())
+        self.menuHome.addAction(self.actionHome)
+        self.menuHome.addAction(self.actionLogout)
 
         self.retranslateUi(MainWindow)
 
@@ -111,6 +123,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.actionHome.setText(QCoreApplication.translate("MainWindow", u"Home", None))
+        self.actionLogout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:28pt; font-weight:700; color:#ff0000;\">Meet</span></p></body></html>", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:28pt; font-weight:700; color:#ff0000;\">UP</span></p></body></html>", None))
         self.loginButton.setText(QCoreApplication.translate("MainWindow", u"Create Account", None))
@@ -122,5 +136,6 @@ class Ui_MainWindow(object):
         self.emailInput.setText("")
         self.emailInput.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Email", None))
         self.phoneInput.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Phone Number", None))
+        self.menuHome.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))
     # retranslateUi
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'homepagehCRdst.ui'
+## Form generated from reading UI file 'homepage.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.0
 ##
@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGroupBox, QHBoxLayout,
     QPushButton, QScrollArea, QSizePolicy, QStatusBar,
     QVBoxLayout, QWidget)
 
-class Ui_HomepageWindow(object):
+class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
