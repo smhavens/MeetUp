@@ -3,7 +3,8 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from pythonUI.ui_loginCreate import Ui_MainWindow
 from pythonUI.ui_login import Ui_LoginWindow
 from pythonUI.ui_homepage import Ui_HomepageWindow
-import mysql
+from pythonUI.ui_createAccount import Ui_CreateUserWindow
+import mysql.connector
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
@@ -23,8 +24,7 @@ username = ''
 userID = None
 main_app = None
 mycursor = None
-
-
+mydb = None
 
 
 class MeetUpApplication(QMainWindow):
@@ -35,6 +35,7 @@ class MeetUpApplication(QMainWindow):
         self.ui_loginCreate.setupUi(self)
         
         self.ui_loginCreate.loginButton.clicked.connect(self.open_login_window)
+        self.ui_loginCreate.loginButton_2.clicked.connect(self.open_create_window)
         
     def open_login_window(self):
          # Hide the current window
@@ -43,6 +44,11 @@ class MeetUpApplication(QMainWindow):
         # Create and show the second window
         self.ui_login = LoginWindow()
         self.ui_login.show()
+        
+    def open_create_window(self):
+        self.hide()
+        self.ui_create = CreateUserWindow()
+        self.ui_create.show()
 
 
 class LoginWindow(QMainWindow):
@@ -62,10 +68,14 @@ class LoginWindow(QMainWindow):
 
         # Set these as attributes, or you can validate/store them as needed
         print(f"Username: {self.username}")
-        print(f"Password: {self.username}")
-
+        print(f"Password: {self.password}")
+        
+        query = """SELECT valid_login(%s, %s) AS isValid;"""
+        mycursor.execute(query, (self.username, self.password))
+        valid = mycursor.fetchone()
+        print(valid)
         # Optional: Add validation or proceed to another action
-        if self.username == "admin" and self.password == "password123":
+        if valid[0]:
             print("Login successful!")
             global username
             username = self.username
@@ -79,18 +89,62 @@ class LoginWindow(QMainWindow):
         # Example: self.ui_second.backButton.clicked.connect(self.go_back)
 
 
+class CreateUserWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.ui_createUser = Ui_CreateUserWindow()
+        self.ui_createUser.setupUi(self)
+        
+        self.ui_createUser.loginButton.clicked.connect(self.createUser)
+        
+    def createUser(self):
+        global username, mydb, mycursor
+        self.username = self.ui_createUser.username.text()
+        self.password = self.ui_createUser.password.text()
+        self.firstName = self.ui_createUser.nameFirst.text()
+        self.lastName = self.ui_createUser.nameLast.text()
+        self.email = self.ui_createUser.emailInput.text()
+        self.phone = self.ui_createUser.phoneInput.text()
+        
+        query = """SELECT * FROM user WHERE userID = %s;"""
+        mycursor.execute(query, (self.username,))
+        valid = mycursor.fetchone()
+        while mycursor.nextset():
+            pass
+        
+        if not valid:
+            query = """CALL create_user(%s, %s, %s, %s, %s, %s);"""
+            mycursor.execute(query, (self.username, self.firstName, self.lastName, self.email, self.phone, self.password))
+            mydb.commit()
+            username = self.username
+            self.hide()
+            self.ui_homepage = HomepageWindow()
+            self.ui_homepage.show()
+        
+        
+
+
 class HomepageWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        global username
         # Set up the second UI
         self.ui_homepage = Ui_HomepageWindow()
         self.ui_homepage.setupUi(self)
-        scrollArea = self.ui_homepage.scrollAreaWidgetContents
-        
+        self.scrollArea = self.ui_homepage.scrollAreaWidgetContents
         self.ui_homepage.actionLogout.triggered.connect(lambda: logout(self))
         
-    def myEvents(self):
-        self.groupEventHalloween = QGroupBox(self.scrollAreaWidgetContents)
+        query = """CALL list_all_invitedto_and_hosted_events(%s)"""
+        mycursor.execute(query, (username,), multi=True)
+        for result in mycursor:
+            allEvents = result.fetchall()  # Fetch rows for the current result set
+            for event in allEvents:
+                print(event)
+        
+    def myEvents(self, name, day, time, id):
+        self.newGroup = QGroupBox(self.scrollArea)
+        # self.groupEventHalloween = QGroupBox(self.scrollAreaWidgetContents)
+        self.newGroup.setObjectName()
         self.groupEventHalloween.setObjectName(u"groupEventHalloween")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
@@ -181,13 +235,17 @@ def logout(current_page):
 def main():
     app = QApplication(sys.argv)
     
-    global main_app, mycursor
+    global main_app, mycursor, mydb
     
-    conn = mysql.connector.connect(
-    host= '216.137.179.68'
-    )   
+    mydb = mysql.connector.connect(user='root', password='password',
+                              host='localhost', database='meetup',
+                              auth_plugin='mysql_native_password')
 
-    mycursor = conn.cursor()
+    mycursor = mydb.cursor()
+    mycursor.execute("SHOW TABLES")
+    myresponce = mycursor.fetchall()
+
+    print(myresponce)
     
     main_app = MeetUpApplication()
     main_app.show()
