@@ -240,8 +240,10 @@ class CreateEventWindow(QMainWindow):
         self.ui_createEvent = Ui_CreateEventWindow()
         self.ui_createEvent.setupUi(self)
         self.invitees = []
+        self.activities = []
         self.ui_createEvent.submitButton.clicked.connect(self.submit_event)
         self.ui_createEvent.inputUsername.returnPressed.connect(self.add_invitee)
+        self.ui_createEvent.inputActivity.returnPressed.connect(self.add_activity)
         
     def submit_event(self):
         #test
@@ -253,11 +255,19 @@ class CreateEventWindow(QMainWindow):
         self.budget = self.ui_createEvent.inputBudget.value()
         
         if self.valid_eventID():
-            query = "CALL create_event(%s, %s, %s, %s, %f, %s)"
+            query = "CALL create_event(%s, %s, %s, %s, %s, %s)"
             mycursor.execute(query, (self.eventID, self.eventName, self.eventDate, self.eventStart, self.budget, username))
+            mydb.commit()
             while mycursor.nextset():
                 pass
-            
+            for activity in self.activities:
+                query = "CALL add_activity(%s, %s)"
+                mycursor.execute(query, (activity, self.eventID))
+                mydb.commit()
+            for invite in self.invitees:
+                query = "CALL invite_guest(%s, %s)"
+                mycursor.execute(query, (invite, self.eventID))
+                mydb.commit()
             self.hide()
             self.ui_home = HomepageWindow()
             self.ui_home.show()
@@ -268,26 +278,26 @@ class CreateEventWindow(QMainWindow):
         # Get the username from the input field
         print("Attempting to add Invitee")
         invitee = self.ui_createEvent.inputUsername.text()
-        self.ui_createEvent.inputUsername.setText('')
+        self.ui_createEvent.inputUsername.clear()
         
         query = """SELECT * FROM user WHERE userID = %s;"""
         mycursor.execute(query, (invitee,))
         valid = mycursor.fetchone()
+        print(valid)
         while mycursor.nextset():
             pass
 
-        if not valid and invitee and invitee not in self.invitees:
+        if valid and invitee and invitee not in self.invitees:
             print("valid Invitee")
             # Add the username to the list
             self.invitees.append(invitee)
             buttonName = u"pushButton" + invitee
             # Create a button for the invitee
-            self.pushButton = QPushButton(self.inviteList)
+            self.pushButton = QPushButton(self.ui_createEvent.inviteList)
             self.pushButton.setObjectName(buttonName)
             sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
             sizePolicy1.setHorizontalStretch(0)
             sizePolicy1.setVerticalStretch(0)
-            sizePolicy1.setHeightForWidth(self.groupEventHalloween.sizePolicy().hasHeightForWidth())
             sizePolicy1.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
             self.pushButton.setSizePolicy(sizePolicy1)
             self.pushButton.setMinimumSize(QSize(125, 0))
@@ -304,7 +314,11 @@ class CreateEventWindow(QMainWindow):
                                             "QPushButton:hover {\n"
                                             "background: rgb(0, 0, 127);\n"
                                             "}")
-            self.gridLayout.addWidget(self.pushButton, 0, 0, 1, 1)
+            self.pushButton.setText(invitee)
+            row_limit = 5
+            row = len(self.invitees) // row_limit
+            column = len(self.invitees) % row_limit
+            self.ui_createEvent.gridLayout.addWidget(self.pushButton, row, column, 1, 1)
             button = QPushButton(invitee, self)
             button.clicked.connect(lambda: print(f"{invitee} clicked!"))
 
@@ -315,6 +329,19 @@ class CreateEventWindow(QMainWindow):
             # self.username_input.clear()
 
             print("Current Invitees:", self.invitees)  # Debugging output
+    
+    def add_activity(self):
+        activity_name = self.ui_createEvent.inputActivity.text()
+        
+        # Check if the input is not empty
+        if activity_name:
+            # Add the activity to the list widget
+            self.ui_createEvent.activityList.addItem(activity_name)
+        
+            # Clear the input field
+            self.ui_createEvent.inputActivity.clear()
+            self.activities.append(activity_name)
+
     
     def valid_eventID(self):
         query = """SELECT * FROM event WHERE eventID = %s;"""

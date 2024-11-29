@@ -266,26 +266,26 @@ class Ui_CreateEventWindow(object):
         self.inviteList.setBaseSize(QSize(0, 200))
         self.gridLayout = QGridLayout(self.inviteList)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.pushButton = QPushButton(self.inviteList)
-        self.pushButton.setObjectName(u"pushButton")
-        sizePolicy1.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
-        self.pushButton.setSizePolicy(sizePolicy1)
-        self.pushButton.setMinimumSize(QSize(125, 0))
-        self.pushButton.setAutoFillBackground(False)
-        self.pushButton.setStyleSheet(u"QPushButton {\n"
-"border: 10;\n"
-"border-radius: 11;\n"
-"border-color: grey;\n"
-"color: white;\n"
-"font: 16pt \"MV Boli\";\n"
-"background: rgb(0, 170, 255);\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"background: rgb(0, 0, 127);\n"
-"}")
+#         self.pushButton = QPushButton(self.inviteList)
+#         self.pushButton.setObjectName(u"pushButton")
+#         sizePolicy1.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
+#         self.pushButton.setSizePolicy(sizePolicy1)
+#         self.pushButton.setMinimumSize(QSize(125, 0))
+#         self.pushButton.setAutoFillBackground(False)
+#         self.pushButton.setStyleSheet(u"QPushButton {\n"
+# "border: 10;\n"
+# "border-radius: 11;\n"
+# "border-color: grey;\n"
+# "color: white;\n"
+# "font: 16pt \"MV Boli\";\n"
+# "background: rgb(0, 170, 255);\n"
+# "}\n"
+# "\n"
+# "QPushButton:hover {\n"
+# "background: rgb(0, 0, 127);\n"
+# "}")
 
-        self.gridLayout.addWidget(self.pushButton, 0, 0, 1, 1)
+#         self.gridLayout.addWidget(self.pushButton, 0, 0, 1, 1)
 
 
         self.verticalLayout_2.addWidget(self.inviteList)
@@ -299,9 +299,6 @@ class Ui_CreateEventWindow(object):
         self.groupBox_4.setSizePolicy(sizePolicy4)
         self.groupBox_4.setMinimumSize(QSize(0, 200))
         self.activityList = QListWidget(self.groupBox_4)
-        QListWidgetItem(self.activityList)
-        QListWidgetItem(self.activityList)
-        QListWidgetItem(self.activityList)
         self.activityList.setObjectName(u"activityList")
         self.activityList.setGeometry(QRect(455, 31, 281, 161))
         sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
@@ -514,17 +511,11 @@ class Ui_CreateEventWindow(object):
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:18pt; font-weight:700; color:#000000;\">Invites</span></p></body></html>", None))
         self.inputUsername.setPlaceholderText(QCoreApplication.translate("MainWindow", u"username", None))
         self.inviteList.setTitle(QCoreApplication.translate("MainWindow", u"Invites", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"smhavens", None))
+        # self.pushButton.setText(QCoreApplication.translate("MainWindow", u"smhavens", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("MainWindow", u"GroupBox", None))
 
         __sortingEnabled = self.activityList.isSortingEnabled()
         self.activityList.setSortingEnabled(False)
-        ___qlistwidgetitem = self.activityList.item(0)
-        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"Bring Snacks", None));
-        ___qlistwidgetitem1 = self.activityList.item(1)
-        ___qlistwidgetitem1.setText(QCoreApplication.translate("MainWindow", u"Temp", None));
-        ___qlistwidgetitem2 = self.activityList.item(2)
-        ___qlistwidgetitem2.setText(QCoreApplication.translate("MainWindow", u"Test", None));
         self.activityList.setSortingEnabled(__sortingEnabled)
 
         self.label_15.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:18pt; font-weight:700; color:#000000;\">Activities</span></p></body></html>", None))
