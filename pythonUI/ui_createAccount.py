@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QApplication, QLabel, QLineEdit, QMainWindow,
 class Ui_CreateUserWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
-            MainWindow.setObjectName(u"MainWindow")
+            MainWindow.setObjectName(u"MeetUP!")
         MainWindow.resize(800, 600)
         palette = QPalette()
         brush = QBrush(QColor(85, 170, 255, 255))

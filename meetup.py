@@ -6,6 +6,8 @@ from pythonUI.ui_homepage import Ui_HomepageWindow
 from pythonUI.ui_createAccount import Ui_CreateUserWindow
 from pythonUI.ui_createEvent import Ui_CreateEventWindow
 from pythonUI.ui_invites import Ui_InviteWindow
+from pythonUI.ui_manageEvent import Ui_ManageEventWindow
+from pythonUI.ui_viewEvent import Ui_ViewEventWindow
 import mysql.connector
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
@@ -22,8 +24,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGroupBox, QHBoxLayout,
     QVBoxLayout, QWidget)
 
 
-username = ''
-userID = None
+username = None
 main_app = None
 mycursor = None
 mydb = None
@@ -137,12 +138,31 @@ class HomepageWindow(QMainWindow):
         self.ui_homepage.actionLogout.triggered.connect(lambda: logout(self))
         self.ui_homepage.pushButton.clicked.connect(self.open_new_event)
         
-        query = """CALL list_all_invitedto_and_hosted_events(%s)"""
-        mycursor.execute(query, (username,), multi=True)
-        for result in mycursor:
-            allEvents = result.fetchall()  # Fetch rows for the current result set
-            for event in allEvents:
-                print(event)
+        print(f"QUERY: CALL list_all_invitedto_and_hosted_events('{username}');")
+        query = """CALL list_all_invitedto_and_hosted_events(%s);"""
+
+        try:
+            print("TRYING")
+            # mycursor.execute(query, (username,), multi=True)
+            mycursor.callproc('list_all_invitedto_and_hosted_events', (username,))
+            print(username)
+            
+            # Check if rows are returned
+            results = mycursor.stored_results()
+            for result in results:
+                allEvents = result.fetchall()
+                if allEvents:
+                    print(f"Found {len(allEvents)} events")
+                    for event in allEvents:
+                        print("An INVITE!")  # Debugging message
+                        eventID, name, day, time = event
+                        print(eventID, name, day, time)  # Debugging message
+                        self.myEvents(name, day, time, eventID)
+                else:
+                    print("No events found!")
+        except Exception as e:
+            print(f"Error: {e}")
+
     
     
     def open_new_event(self):
@@ -151,24 +171,33 @@ class HomepageWindow(QMainWindow):
         self.ui_newEvent.show()
     
     
-    def myEvents(self, name, day, time, id):
+    def myEvents(self, name, day, time, eventID):
+        self.line_2 = QFrame(self.ui_homepage.scrollAreaWidgetContents)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.Shape.HLine)
+        self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.ui_homepage.verticalLayout_2.addWidget(self.line_2)
+        
         self.newGroup = QGroupBox(self.scrollArea)
         # self.groupEventHalloween = QGroupBox(self.scrollAreaWidgetContents)
-        self.newGroup.setObjectName()
-        self.groupEventHalloween.setObjectName(u"groupEventHalloween")
+        self.newGroup.setObjectName(f"eventBox{name}")
+        # self.groupEventHalloween.setObjectName(u"groupEventHalloween")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.groupEventHalloween.sizePolicy().hasHeightForWidth())
-        self.groupEventHalloween.setSizePolicy(sizePolicy1)
-        self.groupEventHalloween.setMinimumSize(QSize(0, 100))
-        self.groupEventHalloween.setStyleSheet(u"border:0;")
-        self.groupEventHalloween.setFlat(True)
-        self.event_halloween = QPushButton(self.groupEventHalloween)
-        self.event_halloween.setObjectName(u"event_halloween")
-        self.event_halloween.setGeometry(QRect(20, 10, 161, 51))
+        sizePolicy1.setHeightForWidth(self.newGroup.sizePolicy().hasHeightForWidth())
+        self.newGroup.setSizePolicy(sizePolicy1)
+        self.newGroup.setMinimumSize(QSize(0, 100))
+        self.newGroup.setStyleSheet(u"border:0;")
+        self.newGroup.setFlat(True)
+        self.tempEvent = QPushButton(self.newGroup)
+        self.tempEvent.setObjectName(f"event{name}")
+        self.tempEvent.setGeometry(QRect(20, 10, 161, 51))
         palette2 = QPalette()
         brush = QBrush(QColor(85, 170, 255, 255))
+        brush1 = QBrush(QColor(255, 255, 255, 255))
+        brush1.setStyle(Qt.SolidPattern)
         palette2.setBrush(QPalette.Active, QPalette.Button, brush1)
         palette2.setBrush(QPalette.Active, QPalette.ButtonText, brush)
         palette2.setBrush(QPalette.Active, QPalette.Base, brush1)
@@ -183,19 +212,19 @@ class HomepageWindow(QMainWindow):
         palette2.setBrush(QPalette.Disabled, QPalette.ButtonText, brush2)
         palette2.setBrush(QPalette.Disabled, QPalette.Base, brush1)
         palette2.setBrush(QPalette.Disabled, QPalette.Window, brush1)
-        self.event_halloween.setPalette(palette2)
+        self.tempEvent.setPalette(palette2)
         font = QFont()
         font.setFamilies([u"MV Boli"])
         font.setPointSize(14)
         font.setBold(True)
-        self.event_halloween.setFont(font)
-        self.event_halloween.setStyleSheet(u"QPushButton:hover {\n"
-"            background:  rgb(170, 0, 0);\n"
-"}")
-        self.event_halloween.setFlat(True)
-        self.label = QLabel(self.groupEventHalloween)
-        self.label.setObjectName(u"label")
-        self.label.setGeometry(QRect(20, 60, 81, 21))
+        self.tempEvent.setFont(font)
+        self.tempEvent.setStyleSheet(u"QPushButton:hover {\n"
+                                    "            background:  rgb(170, 0, 0);\n"
+                                    "}")
+        self.tempEvent.setFlat(True)
+        self.label = QLabel(self.newGroup)
+        self.label.setObjectName(u"label" + name)
+        self.label.setGeometry(QRect(20, 60, 311, 21))
         palette3 = QPalette()
         brush3 = QBrush(QColor(80, 80, 80, 255))
         brush3.setStyle(Qt.SolidPattern)
@@ -218,18 +247,41 @@ class HomepageWindow(QMainWindow):
         font1.setBold(True)
         self.label.setFont(font1)
 
-        self.verticalLayout_2.addWidget(self.groupEventHalloween)
-
-        self.line_2 = QFrame(self.scrollAreaWidgetContents)
-        self.line_2.setObjectName(u"line_2")
-        self.line_2.setFrameShape(QFrame.Shape.HLine)
-        self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
-
-        self.verticalLayout_2.addWidget(self.line_2)
+        self.ui_homepage.verticalLayout_2.addWidget(self.newGroup)
+        
+        # self.newGroup.setTitle(QCoreApplication.translate("MainWindow", u"GroupBox", None))
+        self.tempEvent.setProperty("eventID", eventID)
+        # self.tempEvent.setProperty("isHost", is_host)
+        self.tempEvent.clicked.connect(self.open_event_details)
+        self.tempEvent.setText(name)
+        self.label.setText(day + u" at " + time)
         
         # self.groupEvent_2.setTitle(QCoreApplication.translate("MainWindow", u"GroupBox", None))
         # self.event_halloween_2.setText(QCoreApplication.translate("MainWindow", u"Game Night", None))
         # self.label_2.setText(QCoreApplication.translate("MainWindow", u"11/05", None))
+
+    def open_event_details(self):
+        button = self.sender()
+        
+        eventID = button.property("eventID")
+        isHost = self.is_Host(eventID)
+        
+        if isHost:
+            self.hide()
+            self.ui_openEvent = Ui_ManageEventWindow(eventID)
+            self.ui_openEvent.show()
+        else:
+            self.hide()
+            self.ui_openEvent = Ui_ViewEventWindow(eventID)
+            self.ui_openEvent.show()
+        
+    def is_Host(self, eventID):
+        global username
+        query = """SELECT * FROM event WHERE eventID = %s AND userID = %s;"""
+        mycursor.execute(query, (eventID, username))
+        valid = mycursor.rowcount
+        
+        return valid
 
 
 class CreateEventWindow(QMainWindow):
@@ -272,7 +324,7 @@ class CreateEventWindow(QMainWindow):
             self.ui_home = HomepageWindow()
             self.ui_home.show()
         else:
-            self.ui_createEvent.eventIDError.setStyleSheet("color: red;")
+            self.ui_createEvent.eventIDError.setVisible(True)
     
     def add_invitee(self):
         # Get the username from the input field
@@ -352,6 +404,20 @@ class CreateEventWindow(QMainWindow):
         
         return not valid
 
+
+class ManageEventWindow(QMainWindow):
+    def __init__(self, eventID):
+        super().__init__()
+        global username
+        self.ui_manageEvent = Ui_ManageEventWindow()
+        self.ui_manageEvent.setupUi(self)
+        
+class ViewEventWindow(QMainWindow):
+    def __init__(self, eventID):
+        super().__init__()
+        global username
+        self.ui_viewEvent = Ui_ViewEventWindow()
+        self.ui_viewEvent.setupUi(self)
 
 def logout(current_page):
     global username, main_app

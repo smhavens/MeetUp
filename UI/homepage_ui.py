@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'homepagevufdoS.ui'
+## Form generated from reading UI file 'homepage.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.0
 ##
@@ -21,10 +21,10 @@ from PySide6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLabel,
     QScrollArea, QSizePolicy, QStatusBar, QVBoxLayout,
     QWidget)
 
-class Ui_HomepageWindow(object):
+class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
-            MainWindow.setObjectName(u"MeetUP!")
+            MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(796, 592)
         palette = QPalette()
         brush = QBrush(QColor(85, 170, 255, 255))

@@ -161,7 +161,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>0</y>
+       <y>-196</y>
        <width>767</width>
        <height>725</height>
       </rect>
@@ -356,28 +356,6 @@
           <string>event ID</string>
          </property>
         </widget>
-        <widget class="QLabel" name="eventIDError">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>290</x>
-           <y>20</y>
-           <width>131</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LayoutDirection::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:700; color:#ffffff;&quot;&gt;Already Taken&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-         </property>
-        </widget>
        </widget>
       </item>
       <item>
@@ -523,7 +501,7 @@
           <rect>
            <x>450</x>
            <y>20</y>
-           <width>118</width>
+           <width>291</width>
            <height>23</height>
           </rect>
          </property>
@@ -547,83 +525,6 @@
                <red>83</red>
                <green>83</green>
                <blue>83</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </inactive>
-           <disabled/>
-          </palette>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label">
-         <property name="geometry">
-          <rect>
-           <x>560</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="palette">
-          <palette>
-           <active>
-            <colorrole role="Text">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>0</red>
-               <green>0</green>
-               <blue>0</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </active>
-           <inactive>
-            <colorrole role="Text">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>0</red>
-               <green>0</green>
-               <blue>0</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </inactive>
-           <disabled/>
-          </palette>
-         </property>
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; color:#000000;&quot;&gt;To&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-        <widget class="QTimeEdit" name="timeEnd">
-         <property name="geometry">
-          <rect>
-           <x>600</x>
-           <y>20</y>
-           <width>118</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="palette">
-          <palette>
-           <active>
-            <colorrole role="Base">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>80</red>
-               <green>80</green>
-               <blue>80</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </active>
-           <inactive>
-            <colorrole role="Base">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>80</red>
-               <green>80</green>
-               <blue>80</blue>
               </color>
              </brush>
             </colorrole>
@@ -846,44 +747,7 @@
         <property name="title">
          <string>Invites</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QPushButton" name="pushButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>125</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="autoFillBackground">
-            <bool>false</bool>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton {
-border: 10;
-border-radius: 11;
-border-color: grey;
-color: white;
-font: 16pt &quot;MV Boli&quot;;
-background: rgb(0, 170, 255);
-}
-
-QPushButton:hover {
-background: rgb(0, 0, 127);
-}</string>
-           </property>
-           <property name="text">
-            <string>smhavens</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <layout class="QGridLayout" name="gridLayout"/>
        </widget>
       </item>
       <item>
@@ -1157,21 +1021,6 @@ background: rgb(0, 0, 127);
          <property name="viewMode">
           <enum>QListView::ViewMode::ListMode</enum>
          </property>
-         <item>
-          <property name="text">
-           <string>Bring Snacks</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Temp</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Test</string>
-          </property>
-         </item>
         </widget>
         <widget class="QLabel" name="label_15">
          <property name="geometry">
@@ -1763,6 +1612,28 @@ background: rgb(0, 0, 127);
          </property>
          <property name="text">
           <string>Submit</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="eventIDError">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>510</x>
+           <y>10</y>
+           <width>271</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LayoutDirection::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:16pt; font-weight:700; color:#ff0000;&quot;&gt;EventID Already Taken&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
         </widget>
        </widget>

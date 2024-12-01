@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'loginCreateOkhgFm.ui'
+## Form generated from reading UI file 'loginCreate.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.0
 ##
@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QApplication, QGridLayout, QLabel, QMainWindow,
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
-            MainWindow.setObjectName(u"MeetUP!")
+            MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(800, 600)
         palette = QPalette()
         brush = QBrush(QColor(85, 170, 255, 255))
