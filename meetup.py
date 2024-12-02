@@ -352,7 +352,7 @@ class CreateEventWindow(QMainWindow):
         while mycursor.nextset():
             pass
 
-        if valid and invitee and invitee not in self.invitees:
+        if valid and invitee and invitee != username and invitee not in self.invitees:
             print("valid Invitee")
             # Add the username to the list
             self.invitees.append(invitee)
