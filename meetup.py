@@ -137,26 +137,27 @@ class HomepageWindow(QMainWindow):
         self.scrollArea = self.ui_homepage.scrollAreaWidgetContents
         self.ui_homepage.actionLogout.triggered.connect(lambda: logout(self))
         self.ui_homepage.pushButton.clicked.connect(self.open_new_event)
+        self.ui_homepage.pushButton_2.clicked.connect(self.open_invites)
         
-        print(f"QUERY: CALL list_all_invitedto_and_hosted_events('{username}');")
+        # print(f"QUERY: CALL list_all_invitedto_and_hosted_events('{username}');")
         query = """CALL list_all_invitedto_and_hosted_events(%s);"""
 
         try:
-            print("TRYING")
+            # print("TRYING")
             # mycursor.execute(query, (username,), multi=True)
             mycursor.callproc('list_all_invitedto_and_hosted_events', (username,))
-            print(username)
+            # print(username)
             
             # Check if rows are returned
             results = mycursor.stored_results()
             for result in results:
                 allEvents = result.fetchall()
                 if allEvents:
-                    print(f"Found {len(allEvents)} events")
+                    # print(f"Found {len(allEvents)} events")
                     for event in allEvents:
-                        print("An INVITE!")  # Debugging message
+                        # print("An INVITE!")  # Debugging message
                         eventID, name, day, time = event
-                        print(eventID, name, day, time)  # Debugging message
+                        # print(eventID, name, day, time)  # Debugging message
                         self.myEvents(name, day, time, eventID)
                 else:
                     print("No events found!")
@@ -169,6 +170,12 @@ class HomepageWindow(QMainWindow):
         self.hide()
         self.ui_newEvent = CreateEventWindow()
         self.ui_newEvent.show()
+        
+        
+    def open_invites(self):
+        self.hide()
+        self.ui_inviteView = InviteWindow()
+        self.ui_inviteView.show()
     
     
     def myEvents(self, name, day, time, eventID):
@@ -267,21 +274,27 @@ class HomepageWindow(QMainWindow):
         isHost = self.is_Host(eventID)
         
         if isHost:
+            print(isHost, "IS HOST!")
             self.hide()
-            self.ui_openEvent = Ui_ManageEventWindow(eventID)
+            self.ui_openEvent = ManageEventWindow(eventID)
             self.ui_openEvent.show()
         else:
+            print(isHost, "IS NOT HOST!")
             self.hide()
-            self.ui_openEvent = Ui_ViewEventWindow(eventID)
+            self.ui_openEvent = ViewEventWindow(eventID)
             self.ui_openEvent.show()
         
     def is_Host(self, eventID):
         global username
-        query = """SELECT * FROM event WHERE eventID = %s AND userID = %s;"""
-        mycursor.execute(query, (eventID, username))
-        valid = mycursor.rowcount
+        query = """SELECT userID FROM event WHERE eventID = %s;"""
+        print("SEARCHING", eventID, "FOR HOST", username)
+        mycursor.execute(query, (eventID,))
+        valid = mycursor.fetchone()
         
-        return valid
+        
+        print("IS HOST?:", valid[0])
+        
+        return valid[0] == username
 
 
 class CreateEventWindow(QMainWindow):
@@ -303,7 +316,7 @@ class CreateEventWindow(QMainWindow):
         self.eventName = self.ui_createEvent.nameInput.text()
         self.eventDate = self.ui_createEvent.dateInput.date().toString("yyyy-MM-dd")
         self.eventStart = self.ui_createEvent.timeStart.time().toString("HH:mm:ss")
-        self.eventEnd = self.ui_createEvent.timeEnd.time().toString("HH:mm:ss")
+        # self.eventEnd = self.ui_createEvent.timeEnd.time().toString("HH:mm:ss")
         self.budget = self.ui_createEvent.inputBudget.value()
         
         if self.valid_eventID():
@@ -412,12 +425,51 @@ class ManageEventWindow(QMainWindow):
         self.ui_manageEvent = Ui_ManageEventWindow()
         self.ui_manageEvent.setupUi(self)
         
+        
+        
 class ViewEventWindow(QMainWindow):
     def __init__(self, eventID):
         super().__init__()
         global username
         self.ui_viewEvent = Ui_ViewEventWindow()
         self.ui_viewEvent.setupUi(self)
+        self.ui_viewEvent.submitButton.clicked.connect(self.return_home)
+        
+        
+        if mycursor.with_rows:
+            mycursor.fetchall()  # Clear current result set
+
+        query = """SELECT eventName, eventDay, eventTime, budget FROM event WHERE eventID = %s;"""
+        mycursor.execute(query, (eventID,))
+        self.eventName, self.eventDay, self.eventTime, self.eventBudget = mycursor.fetchone()
+        self.activities = []
+        
+        query = """SELECT activityName FROM activity WHERE eventID = %s;"""
+        mycursor.execute(query, (eventID,))
+        for activity in mycursor.fetchall():
+            print(activity)
+            self.activities.append(activity[0])
+            self.ui_viewEvent.activityList.addItem(activity[0])
+        self.textStart = '<html><head/><body><p align="center"><span style=" font-size:16pt; color:#00007f;">'
+        self.textEnd = '</span></p></body></html>'
+        self.ui_viewEvent.eventName.setText(self.eventName)
+        self.ui_viewEvent.label_3.setText(self.textStart + self.eventDay + self.textEnd)
+        self.ui_viewEvent.label.setText(self.textStart + self.eventTime + self.textEnd)
+        self.ui_viewEvent.label_2.setText(self.textStart + str(self.eventBudget) + self.textEnd)
+        self.ui_viewEvent.label_4.setText(self.textStart + eventID + self.textEnd)
+        
+    def return_home(self):
+        self.hide()
+        self.ui_homepage = HomepageWindow()
+        self.ui_homepage.show()
+        
+        
+class InviteWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        global username
+        self.ui_inviteEvent = Ui_InviteWindow()
+        self.ui_inviteEvent.setupUi(self)
 
 def logout(current_page):
     global username, main_app

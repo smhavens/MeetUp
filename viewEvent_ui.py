@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'viewEventYKbwSz.ui'
+## Form generated from reading UI file 'viewEvent.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.0
 ##
@@ -20,10 +20,10 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGroupBox, QLabel,
     QMenuBar, QPushButton, QScrollArea, QSizePolicy,
     QStatusBar, QVBoxLayout, QWidget)
 
-class Ui_ViewEventWindow(object):
+class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
-            MainWindow.setObjectName(u"MeetUP!")
+            MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(800, 600)
         palette = QPalette()
         brush = QBrush(QColor(85, 170, 255, 255))
@@ -363,7 +363,7 @@ class Ui_ViewEventWindow(object):
 "background: rgb(0, 0, 127);\n"
 "}")
 
-        self.verticalLayout_2.addWidget(self.groupBox_11, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.verticalLayout_2.addWidget(self.groupBox_11, 0, Qt.AlignmentFlag.Qt.AlignmentFlag.AlignVCenter)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         MainWindow.setCentralWidget(self.centralwidget)

@@ -583,7 +583,7 @@ class Ui_ManageEventWindow(object):
 "font: 16pt \"MV Boli\";\n"
 "background: rgb(0, 170, 255);")
 
-        self.verticalLayout_2.addWidget(self.groupBox_11, 0, Qt.AlignmentFlag.Qt.AlignmentFlag.AlignVCenter)
+        self.verticalLayout_2.addWidget(self.groupBox_11, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         MainWindow.setCentralWidget(self.centralwidget)

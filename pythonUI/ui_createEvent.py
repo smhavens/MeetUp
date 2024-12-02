@@ -441,7 +441,7 @@ class Ui_CreateEventWindow(object):
         self.eventIDError.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
         self.eventIDError.setVisible(False)
 
-        self.verticalLayout_2.addWidget(self.groupBox_11, 0, Qt.AlignmentFlag.Qt.AlignmentFlag.AlignVCenter)
+        self.verticalLayout_2.addWidget(self.groupBox_11, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         MainWindow.setCentralWidget(self.centralwidget)
