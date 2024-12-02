@@ -385,7 +385,7 @@ class CreateEventWindow(QMainWindow):
             column = len(self.invitees) % row_limit
             self.ui_createEvent.gridLayout.addWidget(self.pushButton, row, column, 1, 1)
             button = QPushButton(invitee, self)
-            button.clicked.connect(lambda: print(f"{invitee} clicked!"))
+            # button.clicked.connect(lambda: self.uninvite(invitee))
 
             # # Add the button to the layout
             # self.invitees_layout.addWidget(button)
@@ -422,10 +422,146 @@ class ManageEventWindow(QMainWindow):
     def __init__(self, eventID):
         super().__init__()
         global username
+        self.eventID = eventID
         self.ui_manageEvent = Ui_ManageEventWindow()
         self.ui_manageEvent.setupUi(self)
         
+        # if mycursor.with_rows:
+        #     mycursor.fetchall()  # Clear current result set
+
+        query = """SELECT eventName, eventDay, eventTime, budget FROM event WHERE eventID = %s;"""
+        mycursor.execute(query, (eventID,))
+        self.eventName, self.eventDay, self.eventTime, self.eventBudget = mycursor.fetchone()
+        self.activities = []
+        self.invitees = []
         
+        query = """SELECT activityName FROM activity WHERE eventID = %s;"""
+        mycursor.execute(query, (eventID,))
+        for activity in mycursor.fetchall():
+            print(activity)
+            self.activities.append(activity[0])
+            self.ui_manageEvent.activityList.addItem(activity[0])
+        # self.textStart = '<html><head/><body><p align="center"><span style=" font-size:16pt; color:#00007f;">'
+        # self.textEnd = '</span></p></body></html>'
+        # self.ui_viewEvent.eventName.setText(self.eventName)
+        qdate = QDate.fromString(self.eventDay, "d:mm:yyyy")
+
+        # widget_date = QDateEdit()
+        # Set the format of how the QDate will be displayed in the widget
+        self.ui_manageEvent.dateInput.setDisplayFormat("d:mm:yyyy")
+
+        self.ui_manageEvent.dateInput.setDate(qdate)
+        # self.ui_manageEvent.dateInput.setDate()
+        qtime = QTime.fromString(self.eventTime, "h:mm AP")
+        self.ui_manageEvent.timeStart.setTime(qtime)
+        self.ui_manageEvent.inputBudget.setValue(int(self.eventBudget))
+        
+        query = """SELECT userID FROM invitedto WHERE eventID = %s;"""
+        mycursor.execute(query, (eventID,))
+        for invite in mycursor.fetchall():
+            print(invite)
+            self.invitees.append(invite[0])
+            # self.ui_manageEvent.inviteList.addItem(activity[0])
+        
+        self.list_invitee()
+        self.ui_manageEvent.nameInput.setText(self.eventName)
+        
+        
+    def add_invitee(self):
+        # Get the username from the input field
+        print("Attempting to add Invitee")
+        invitee = self.ui_manageEvent.inputUsername.text()
+        self.ui_manageEvent.inputUsername.clear()
+        
+        query = """SELECT * FROM user WHERE userID = %s;"""
+        mycursor.execute(query, (invitee,))
+        valid = mycursor.fetchone()
+        print(valid)
+        while mycursor.nextset():
+            pass
+
+        if valid and invitee and invitee != username and invitee not in self.invitees:
+            print("valid Invitee")
+            # Add the username to the list
+            self.invitees.append(invitee)
+            buttonName = u"pushButton" + invitee
+            # Create a button for the invitee
+            self.pushButton = QPushButton(self.ui_manageEvent.inviteList)
+            self.pushButton.setObjectName(buttonName)
+            sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+            sizePolicy1.setHorizontalStretch(0)
+            sizePolicy1.setVerticalStretch(0)
+            sizePolicy1.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
+            self.pushButton.setSizePolicy(sizePolicy1)
+            self.pushButton.setMinimumSize(QSize(125, 0))
+            self.pushButton.setAutoFillBackground(False)
+            self.pushButton.setStyleSheet(u"QPushButton {\n"
+                                            "border: 10;\n"
+                                            "border-radius: 11;\n"
+                                            "border-color: grey;\n"
+                                            "color: white;\n"
+                                            "font: 16pt \"MV Boli\";\n"
+                                            "background: rgb(0, 170, 255);\n"
+                                            "}\n"
+                                            "\n"
+                                            "QPushButton:hover {\n"
+                                            "background: rgb(0, 0, 127);\n"
+                                            "}")
+            self.pushButton.setText(invitee)
+            row_limit = 5
+            row = len(self.invitees) // row_limit
+            column = len(self.invitees) % row_limit
+            self.ui_manageEvent.gridLayout.addWidget(self.pushButton, row, column, 1, 1)
+            button = QPushButton(invitee, self)
+            button.clicked.connect(lambda checked, uid=invitee, btn=button: self.uninvite(uid, btn))
+
+            # # Add the button to the layout
+            # self.invitees_layout.addWidget(button)
+
+            # # Clear the input field
+            # self.username_input.clear()
+
+            print("Current Invitees:", self.invitees)  # Debugging output
+            
+    def list_invitee(self):
+        print("Attempting to LIST Invitees")
+        for idx, invite in enumerate(self.invitees):
+            print("ADDING Invitee", invite)
+            
+            # Create the button
+            button = QPushButton(invite, self.ui_manageEvent.inviteList)
+            button.setStyleSheet(u"QPushButton {\n"
+                                "border: 10;\n"
+                                "border-radius: 11;\n"
+                                "border-color: grey;\n"
+                                "color: white;\n"
+                                "font: 16pt \"MV Boli\";\n"
+                                "background: rgb(0, 170, 255);\n"
+                                "}\n"
+                                "\n"
+                                "QPushButton:hover {\n"
+                                "background: rgb(0, 0, 127);\n"
+                                "}")
+            
+            # Calculate row and column for layout
+            row_limit = 5
+            row = idx // row_limit
+            column = idx % row_limit
+            self.ui_manageEvent.gridLayout.addWidget(button, row, column, 1, 1)
+
+            # Connect the button to uninvite
+            button.clicked.connect(lambda checked, uid=invite, btn=button: self.uninvite(uid, btn))
+            print("Current Invitees:", self.invitees)  # Debugging output
+
+            
+    def uninvite(self, userid, button):
+        query = "DELETE FROM invitedto WHERE userID = %s AND eventID = %s;"
+        mycursor.execute(query, (userid, self.eventID))
+        mydb.commit()
+        self.invitees.remove(userid)  # Remove from the list
+        button.deleteLater()  # Remove the button
+        print(f"Uninvited {userid}, Current Invitees: {self.invitees}")
+            
         
 class ViewEventWindow(QMainWindow):
     def __init__(self, eventID):
