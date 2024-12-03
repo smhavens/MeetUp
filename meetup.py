@@ -140,30 +140,44 @@ class HomepageWindow(QMainWindow):
         self.ui_homepage.pushButton_2.clicked.connect(self.open_invites)
         
         # print(f"QUERY: CALL list_all_invitedto_and_hosted_events('{username}');")
-        query = """CALL list_all_invitedto_and_hosted_events(%s);"""
+        # query = """CALL list_all_invitedto_and_hosted_events(%s);"""
 
         try:
-            # print("TRYING")
-            # mycursor.execute(query, (username,), multi=True)
-            mycursor.callproc('list_all_invitedto_and_hosted_events', (username,))
-            # print(username)
+            print("TRYING")
             
-            # Check if rows are returned
-            results = mycursor.stored_results()
-            for result in results:
-                allEvents = result.fetchall()
-                if allEvents:
-                    # print(f"Found {len(allEvents)} events")
-                    for event in allEvents:
-                        # print("An INVITE!")  # Debugging message
+            # Fetch RSVP-related events
+            query = """SELECT eventID FROM invitedto WHERE userID = %s AND rsvp = 'Going';"""
+            mycursor.execute(query, (username,))
+            allEvents = mycursor.fetchall()
+            print("FETCHALL RSVP Events")
+
+            # Call the stored procedure
+            mycursor.callproc('list_all_hosted_events_for_user', (username,))
+            print("CALL Procedure")
+
+            # Retrieve hosted events
+            for result in mycursor.stored_results():
+                hostedEvents = result.fetchall()
+                if hostedEvents:
+                    for event in hostedEvents:
+                        print("Hosted Event:", event)  # Debugging output
                         eventID, name, day, time = event
-                        # print(eventID, name, day, time)  # Debugging message
                         self.myEvents(name, day, time, eventID)
                 else:
-                    print("No events found!")
+                    print("No hosted events found!")
+
+            # Process RSVP-related events
+            if allEvents:
+                for event in allEvents:
+                    eventID = event[0]
+                    query = """SELECT eventName, eventDay, eventTime FROM event WHERE eventID = %s;"""
+                    mycursor.execute(query, (eventID,))
+                    name, day, time = mycursor.fetchone()
+                    self.myEvents(name, day, time, eventID)
+            else:
+                print("No RSVP events found!")
         except Exception as e:
             print(f"Error: {e}")
-
     
     
     def open_new_event(self):
@@ -465,6 +479,15 @@ class ManageEventWindow(QMainWindow):
         
         self.list_invitee()
         self.ui_manageEvent.nameInput.setText(self.eventName)
+        queryRSVP = """SELECT num_invitees(%s) AS numInvited;"""
+        queryAccept = """SELECT num_accepted_invitees(%s) AS acceptedInvites;"""
+        mycursor.execute(queryRSVP, (eventID,))
+        numInvited = mycursor.fetchone()[0]
+        print(numInvited)
+        mycursor.execute(queryAccept, (eventID,))
+        numAccept = mycursor.fetchone()[0]
+        self.ui_manageEvent.label_2.setText(f'<html><head/><body><p><span style=" font-size:14pt; font-weight:700; color:#ff0000;">INVITED: {numInvited}</span></p></body></html>')
+        self.ui_manageEvent.label_3.setText(f'<html><head/><body><p><span style=" font-size:14pt; font-weight:700; color:#00aa00;">RSVP: {numAccept}</span></p></body></html>')
         
         
     def add_invitee(self):
@@ -606,6 +629,149 @@ class InviteWindow(QMainWindow):
         global username
         self.ui_inviteEvent = Ui_InviteWindow()
         self.ui_inviteEvent.setupUi(self)
+        
+        try:
+            # print("TRYING")
+            # mycursor.execute(query, (username,), multi=True)
+            mycursor.callproc('list_all_pending_invites_for_user', (username,))
+            # query = """SELECT rsvp FROM invitedto WHERE userID = %s AND rsvp = 'Going';"""
+            # mycursor.execute(query, (username, eventID), multi=True)
+            # print(username)
+            
+            # Check if rows are returned
+            results = mycursor.stored_results()
+            print("AFTER RESULTS")
+            # allEvents = mycursor.fetchall()
+            for result in results:
+                print("IN FIRST FOR")
+                allEvents = result.fetchall()
+                if allEvents:
+                    # print(f"Found {len(allEvents)} events")
+                    for event in allEvents:
+                        # print("An INVITE!")  # Debugging message
+                        # eventID, name, day, time = event
+                        print(event)
+                        eventID = event
+                        query = """SELECT eventName, eventDay, eventTime FROM event WHERE eventID = %s;"""
+                        mycursor.execute(query, (eventID,))
+                        
+                        # valid = mycursor.fetchone()
+                        # print(valid)
+                        name, day, time = mycursor.fetchone()
+                        # print(eventID, name, day, time)  # Debugging message
+                        self.myEvents(name, day, time, eventID)
+            else:
+                print("No events found!")
+        except Exception as e:
+            print(f"Error: {e}")
+        
+    def myEvents(self, name, day, time, eventID):
+        self.line_2 = QFrame(self.ui_inviteEvent.scrollAreaWidgetContents)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.Shape.HLine)
+        self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.ui_inviteEvent.verticalLayout_2.addWidget(self.line_2)
+        
+        self.newGroup = QGroupBox(self.scrollArea)
+        # self.groupEventHalloween = QGroupBox(self.scrollAreaWidgetContents)
+        self.newGroup.setObjectName(f"eventBox{name}")
+        # self.groupEventHalloween.setObjectName(u"groupEventHalloween")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.newGroup.sizePolicy().hasHeightForWidth())
+        self.newGroup.setSizePolicy(sizePolicy1)
+        self.newGroup.setMinimumSize(QSize(0, 100))
+        self.newGroup.setStyleSheet(u"border:0;")
+        self.newGroup.setFlat(True)
+        self.tempEvent = QPushButton(self.newGroup)
+        self.tempEvent.setObjectName(f"event{name}")
+        self.tempEvent.setGeometry(QRect(20, 10, 161, 51))
+        palette2 = QPalette()
+        brush = QBrush(QColor(85, 170, 255, 255))
+        brush1 = QBrush(QColor(255, 255, 255, 255))
+        brush1.setStyle(Qt.SolidPattern)
+        palette2.setBrush(QPalette.Active, QPalette.Button, brush1)
+        palette2.setBrush(QPalette.Active, QPalette.ButtonText, brush)
+        palette2.setBrush(QPalette.Active, QPalette.Base, brush1)
+        palette2.setBrush(QPalette.Active, QPalette.Window, brush1)
+        palette2.setBrush(QPalette.Inactive, QPalette.Button, brush1)
+        palette2.setBrush(QPalette.Inactive, QPalette.ButtonText, brush)
+        palette2.setBrush(QPalette.Inactive, QPalette.Base, brush1)
+        palette2.setBrush(QPalette.Inactive, QPalette.Window, brush1)
+        palette2.setBrush(QPalette.Disabled, QPalette.Button, brush1)
+        brush2 = QBrush(QColor(255, 255, 255, 135))
+        brush2.setStyle(Qt.SolidPattern)
+        palette2.setBrush(QPalette.Disabled, QPalette.ButtonText, brush2)
+        palette2.setBrush(QPalette.Disabled, QPalette.Base, brush1)
+        palette2.setBrush(QPalette.Disabled, QPalette.Window, brush1)
+        self.tempEvent.setPalette(palette2)
+        font = QFont()
+        font.setFamilies([u"MV Boli"])
+        font.setPointSize(14)
+        font.setBold(True)
+        self.tempEvent.setFont(font)
+        self.tempEvent.setStyleSheet(u"QPushButton:hover {\n"
+                                    "            background:  rgb(170, 0, 0);\n"
+                                    "}")
+        self.tempEvent.setFlat(True)
+        self.label = QLabel(self.newGroup)
+        self.label.setObjectName(u"label" + name)
+        self.label.setGeometry(QRect(20, 60, 311, 21))
+        palette3 = QPalette()
+        brush3 = QBrush(QColor(80, 80, 80, 255))
+        brush3.setStyle(Qt.SolidPattern)
+        brush1 = QBrush(QColor(255, 255, 255, 255))
+        palette3.setBrush(QPalette.Active, QPalette.WindowText, brush3)
+        palette3.setBrush(QPalette.Active, QPalette.Button, brush1)
+        palette3.setBrush(QPalette.Active, QPalette.Base, brush1)
+        palette3.setBrush(QPalette.Active, QPalette.Window, brush1)
+        palette3.setBrush(QPalette.Inactive, QPalette.WindowText, brush3)
+        palette3.setBrush(QPalette.Inactive, QPalette.Button, brush1)
+        palette3.setBrush(QPalette.Inactive, QPalette.Base, brush1)
+        palette3.setBrush(QPalette.Inactive, QPalette.Window, brush1)
+        palette3.setBrush(QPalette.Disabled, QPalette.Button, brush1)
+        palette3.setBrush(QPalette.Disabled, QPalette.Base, brush1)
+        palette3.setBrush(QPalette.Disabled, QPalette.Window, brush1)
+        self.label.setPalette(palette3)
+        font1 = QFont()
+        font1.setFamilies([u"MV Boli"])
+        font1.setPointSize(12)
+        font1.setBold(True)
+        self.label.setFont(font1)
+
+        self.ui_inviteEvent.verticalLayout_2.addWidget(self.newGroup)
+        
+        # self.newGroup.setTitle(QCoreApplication.translate("MainWindow", u"GroupBox", None))
+        self.tempEvent.setProperty("eventID", eventID)
+        # self.tempEvent.setProperty("isHost", is_host)
+        self.tempEvent.clicked.connect(lambda: self.begin_rsvp())
+        # self.tempEvent.clicked.connect(lambda checked, name=name: self.begin_rsvp())
+        self.tempEvent.setText(name)
+        self.label.setText(day + u" at " + time)
+        
+    def begin_rsvp(self):
+        self.ui_inviteEvent.pushButton.disconnect()
+        self.ui_inviteEvent.pushButton_2.disconnect()
+        self.ui_inviteEvent.groupBox.setEnabled(True)
+        eventID = self.sender().property("eventID")
+        self.ui_inviteEvent.pushButton.clicked.connect(lambda: self.rsvp(eventID, 'Going'))
+        self.ui_inviteEvent.pushButton_2.clicked.connect(lambda: self.rsvp(eventID, 'Not Going'))
+        
+    def rsvp(self, eventID, response):
+        queryName = """SELECT eventName FROM event WHERE eventID = %s;"""
+        mycursor.execute(queryName, (eventID,))
+        name = mycursor.fetchone()[0]
+        deleteBox = f"eventBox{name}"
+        print("DELETING", deleteBox)
+        query = "CALL rsvp_for_event(%s, %s, %s);"
+        mycursor.execute(query, (username, eventID, response))
+        mydb.commit()
+        myBox = self.findChild(QGroupBox, deleteBox)
+        myBox.deleteLater()
+        # sip.delete(self.widget_name)
+        # self.widget_name = None
 
 def logout(current_page):
     global username, main_app
