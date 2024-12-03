@@ -418,8 +418,29 @@ QPushButton:hover {
      <height>33</height>
     </rect>
    </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionhome"/>
+    <addaction name="actionlogout"/>
+   </widget>
+   <addaction name="menuOptions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionhome">
+   <property name="text">
+    <string>home</string>
+   </property>
+  </action>
+  <action name="actionlogout">
+   <property name="text">
+    <string>logout</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

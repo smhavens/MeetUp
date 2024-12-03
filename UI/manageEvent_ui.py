@@ -11,15 +11,17 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
 from PySide6.QtWidgets import (QApplication, QDateEdit, QFrame, QGridLayout,
     QGroupBox, QLabel, QLineEdit, QListView,
-    QListWidget, QListWidgetItem, QMainWindow, QMenuBar,
-    QPushButton, QScrollArea, QSizePolicy, QSpinBox,
-    QStatusBar, QTimeEdit, QVBoxLayout, QWidget)
+    QListWidget, QListWidgetItem, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QScrollArea, QSizePolicy,
+    QSpinBox, QStatusBar, QTimeEdit, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -36,6 +38,10 @@ class Ui_MainWindow(object):
         palette.setBrush(QPalette.Disabled, QPalette.Base, brush)
         palette.setBrush(QPalette.Disabled, QPalette.Window, brush)
         MainWindow.setPalette(palette)
+        self.actionhome = QAction(MainWindow)
+        self.actionhome.setObjectName(u"actionhome")
+        self.actionlogout = QAction(MainWindow)
+        self.actionlogout.setObjectName(u"actionlogout")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.scrollArea = QScrollArea(self.centralwidget)
@@ -590,10 +596,17 @@ class Ui_MainWindow(object):
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 800, 33))
+        self.menubar.setAutoFillBackground(True)
+        self.menuOptions = QMenu(self.menubar)
+        self.menuOptions.setObjectName(u"menuOptions")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.menubar.addAction(self.menuOptions.menuAction())
+        self.menuOptions.addAction(self.actionhome)
+        self.menuOptions.addAction(self.actionlogout)
 
         self.retranslateUi(MainWindow)
 
@@ -602,6 +615,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.actionhome.setText(QCoreApplication.translate("MainWindow", u"home", None))
+        self.actionlogout.setText(QCoreApplication.translate("MainWindow", u"logout", None))
         self.nameInput.setText("")
         self.nameInput.setPlaceholderText(QCoreApplication.translate("MainWindow", u"My New Event", None))
         self.groupBox_5.setTitle(QCoreApplication.translate("MainWindow", u"GroupBox", None))
@@ -624,5 +639,6 @@ class Ui_MainWindow(object):
         self.submitButton.setText(QCoreApplication.translate("MainWindow", u"Submit", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:14pt; font-weight:700; color:#ff0000;\">INVITED: </span></p></body></html>", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:14pt; font-weight:700; color:#00aa00;\">RSVP: </span></p></body></html>", None))
+        self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))
     # retranslateUi
 

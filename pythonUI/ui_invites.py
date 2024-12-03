@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'invitesTuqxku.ui'
+## Form generated from reading UI file 'invitesmBlbqY.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.0
 ##
@@ -11,13 +11,15 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QGroupBox, QLabel,
-    QMainWindow, QMenuBar, QPushButton, QScrollArea,
-    QSizePolicy, QStatusBar, QVBoxLayout, QWidget)
+    QMainWindow, QMenu, QMenuBar, QPushButton,
+    QScrollArea, QSizePolicy, QStatusBar, QVBoxLayout,
+    QWidget)
 
 class Ui_InviteWindow(object):
     def setupUi(self, MainWindow):
@@ -34,6 +36,10 @@ class Ui_InviteWindow(object):
         palette.setBrush(QPalette.Disabled, QPalette.Base, brush)
         palette.setBrush(QPalette.Disabled, QPalette.Window, brush)
         MainWindow.setPalette(palette)
+        self.actionhome = QAction(MainWindow)
+        self.actionhome.setObjectName(u"actionhome")
+        self.actionlogout = QAction(MainWindow)
+        self.actionlogout.setObjectName(u"actionlogout")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.myEvents = QScrollArea(self.centralwidget)
@@ -168,10 +174,17 @@ class Ui_InviteWindow(object):
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 800, 33))
+        self.menubar.setAutoFillBackground(True)
+        self.menuOptions = QMenu(self.menubar)
+        self.menuOptions.setObjectName(u"menuOptions")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.menubar.addAction(self.menuOptions.menuAction())
+        self.menuOptions.addAction(self.actionhome)
+        self.menuOptions.addAction(self.actionlogout)
 
         self.retranslateUi(MainWindow)
 
@@ -183,9 +196,12 @@ class Ui_InviteWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.actionhome.setText(QCoreApplication.translate("MainWindow", u"home", None))
+        self.actionlogout.setText(QCoreApplication.translate("MainWindow", u"logout", None))
         self.label_myEvents.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:18pt; font-weight:700; text-decoration: underline; color:#ff0000;\">My Invites</span></p></body></html>", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"RSVP?", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Accept", None))
         self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"Reject", None))
+        self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))
     # retranslateUi
 
