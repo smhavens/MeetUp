@@ -124,8 +124,6 @@ class CreateUserWindow(QMainWindow):
             self.ui_homepage = HomepageWindow()
             self.ui_homepage.show()
         
-        
-
 
 class HomepageWindow(QMainWindow):
     def __init__(self):
@@ -441,6 +439,9 @@ class ManageEventWindow(QMainWindow):
         self.ui_manageEvent.setupUi(self)
         self.ui_manageEvent.actionhome.triggered.connect(self.return_home)
         self.ui_manageEvent.actionlogout.triggered.connect(lambda: logout(self))
+        self.ui_manageEvent.submitButton.clicked.connect(self.submit_changes)
+        self.ui_manageEvent.inputActivity.returnPressed.connect(self.add_activity)
+        self.ui_manageEvent.inputUsername.returnPressed.connect(self.add_invitee)
         
         # if mycursor.with_rows:
         #     mycursor.fetchall()  # Clear current result set
@@ -450,6 +451,8 @@ class ManageEventWindow(QMainWindow):
         self.eventName, self.eventDay, self.eventTime, self.eventBudget = mycursor.fetchone()
         self.activities = []
         self.invitees = []
+        self.newInvites = []
+        self.newActivity = []
         
         query = """SELECT activityName FROM activity WHERE eventID = %s;"""
         mycursor.execute(query, (eventID,))
@@ -513,7 +516,7 @@ class ManageEventWindow(QMainWindow):
         if valid and invitee and invitee != username and invitee not in self.invitees:
             print("valid Invitee")
             # Add the username to the list
-            self.invitees.append(invitee)
+            self.newInvites.append(invitee)
             buttonName = u"pushButton" + invitee
             # Create a button for the invitee
             self.pushButton = QPushButton(self.ui_manageEvent.inviteList)
@@ -551,7 +554,7 @@ class ManageEventWindow(QMainWindow):
             # # Clear the input field
             # self.username_input.clear()
 
-            print("Current Invitees:", self.invitees)  # Debugging output
+            print("Current Invitees:", self.newInvites)  # Debugging output
             
     def list_invitee(self):
         print("Attempting to LIST Invitees")
@@ -591,23 +594,35 @@ class ManageEventWindow(QMainWindow):
         button.deleteLater()  # Remove the button
         print(f"Uninvited {userid}, Current Invitees: {self.invitees}")
             
-    def submit_changes(self):
-        self.eventName = self.ui_manageEvent.nameInput.text()
-        self.eventDate = self.ui_manageEvent.dateInput.date().toString("yyyy-MM-dd")
-        self.eventStart = self.ui_manageEvent.timeStart.time().toString("HH:mm:ss")
-        # self.eventEnd = self.ui_createEvent.timeEnd.time().toString("HH:mm:ss")
-        self.budget = self.ui_manageEvent.inputBudget.value()
+    def add_activity(self):
+        activity_name = self.ui_manageEvent.inputActivity.text()
         
-        query = "CALL create_event(%s, %s, %s, %s, %s, %s)"
-        mycursor.execute(query, (self.eventID, self.eventName, self.eventDate, self.eventStart, self.budget, username))
+        # Check if the input is not empty
+        if activity_name and activity_name not in self.newActivity and activity_name not in self.activities:
+            # Add the activity to the list widget
+            self.ui_manageEvent.activityList.addItem(activity_name)
+        
+            # Clear the input field
+            self.ui_manageEvent.inputActivity.clear()
+            self.newActivity.append(activity_name)
+            
+    def submit_changes(self):
+        eventName = self.ui_manageEvent.nameInput.text()
+        eventDay = self.ui_manageEvent.dateInput.date().toString("yyyy-MM-dd")
+        eventStart = self.ui_manageEvent.timeStart.time().toString("HH:mm:ss")
+        # self.eventEnd = self.ui_createEvent.timeEnd.time().toString("HH:mm:ss")
+        budget = self.ui_manageEvent.inputBudget.value()
+        
+        query = "UPDATE event SET eventName = %s, eventDay = %s, eventTime = %s, budget = %s WHERE eventID = %s;"
+        mycursor.execute(query, (eventName, eventDay, eventStart, budget, self.eventID))
         mydb.commit()
         while mycursor.nextset():
             pass
-        for activity in self.activities:
+        for activity in self.newActivity:
             query = "CALL add_activity(%s, %s)"
             mycursor.execute(query, (activity, self.eventID))
             mydb.commit()
-        for invite in self.invitees:
+        for invite in self.newInvites:
             query = "CALL invite_guest(%s, %s)"
             mycursor.execute(query, (invite, self.eventID))
             mydb.commit()
