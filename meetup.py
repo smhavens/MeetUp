@@ -10,18 +10,12 @@ from pythonUI.ui_manageEvent import Ui_ManageEventWindow
 from pythonUI.ui_viewEvent import Ui_ViewEventWindow
 import mysql.connector
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
-    QCursor, QFont, QFontDatabase, QGradient,
-    QIcon, QImage, QKeySequence, QLinearGradient,
-    QPainter, QPalette, QPixmap, QRadialGradient,
-    QTransform)
+from PySide6.QtCore import (QDate, QRect,
+    QSize, QTime, Qt)
+from PySide6.QtGui import (QBrush, QColor, QFont, QPalette)
 from PySide6.QtWidgets import (QApplication, QFrame, QGroupBox, QHBoxLayout,
-    QLabel, QMainWindow, QMenu, QMenuBar,
-    QPushButton, QScrollArea, QSizePolicy, QStatusBar,
-    QVBoxLayout, QWidget)
+    QLabel, QMainWindow,
+    QPushButton, QSizePolicy)
 
 
 username = None
@@ -136,9 +130,6 @@ class HomepageWindow(QMainWindow):
         self.ui_homepage.actionLogout.triggered.connect(lambda: logout(self))
         self.ui_homepage.pushButton.clicked.connect(self.open_new_event)
         self.ui_homepage.pushButton_2.clicked.connect(self.open_invites)
-        
-        # print(f"QUERY: CALL list_all_invitedto_and_hosted_events('{username}');")
-        # query = """CALL list_all_invitedto_and_hosted_events(%s);"""
 
         try:
             print("TRYING")
@@ -274,10 +265,6 @@ class HomepageWindow(QMainWindow):
         self.tempEvent.clicked.connect(self.open_event_details)
         self.tempEvent.setText(name)
         self.label.setText(day + u" at " + time)
-        
-        # self.groupEvent_2.setTitle(QCoreApplication.translate("MainWindow", u"GroupBox", None))
-        # self.event_halloween_2.setText(QCoreApplication.translate("MainWindow", u"Game Night", None))
-        # self.label_2.setText(QCoreApplication.translate("MainWindow", u"11/05", None))
 
     def open_event_details(self):
         button = self.sender()
@@ -442,9 +429,6 @@ class ManageEventWindow(QMainWindow):
         self.ui_manageEvent.submitButton.clicked.connect(self.submit_changes)
         self.ui_manageEvent.inputActivity.returnPressed.connect(self.add_activity)
         self.ui_manageEvent.inputUsername.returnPressed.connect(self.add_invitee)
-        
-        # if mycursor.with_rows:
-        #     mycursor.fetchall()  # Clear current result set
 
         query = """SELECT eventName, eventDay, eventTime, budget FROM event WHERE eventID = %s;"""
         mycursor.execute(query, (eventID,))
@@ -460,13 +444,8 @@ class ManageEventWindow(QMainWindow):
             print(activity)
             self.activities.append(activity[0])
             self.ui_manageEvent.activityList.addItem(activity[0])
-        # self.textStart = '<html><head/><body><p align="center"><span style=" font-size:16pt; color:#00007f;">'
-        # self.textEnd = '</span></p></body></html>'
-        # self.ui_viewEvent.eventName.setText(self.eventName)
         qdate = QDate.fromString(self.eventDay, "d:mm:yyyy")
 
-        # widget_date = QDateEdit()
-        # Set the format of how the QDate will be displayed in the widget
         self.ui_manageEvent.dateInput.setDisplayFormat("d:mm:yyyy")
 
         self.ui_manageEvent.dateInput.setDate(qdate)
@@ -547,12 +526,6 @@ class ManageEventWindow(QMainWindow):
             self.ui_manageEvent.gridLayout.addWidget(self.pushButton, row, column, 1, 1)
             button = QPushButton(invitee, self)
             button.clicked.connect(lambda checked, uid=invitee, btn=button: self.uninvite(uid, btn))
-
-            # # Add the button to the layout
-            # self.invitees_layout.addWidget(button)
-
-            # # Clear the input field
-            # self.username_input.clear()
 
             print("Current Invitees:", self.newInvites)  # Debugging output
             
@@ -637,10 +610,6 @@ class ViewEventWindow(QMainWindow):
         self.ui_viewEvent = Ui_ViewEventWindow()
         self.ui_viewEvent.setupUi(self)
         self.ui_viewEvent.submitButton.clicked.connect(self.return_home)
-        
-        
-        # if mycursor.with_rows:
-        #     mycursor.fetchall()  # Clear current result set
 
         query = """SELECT eventName, eventDay, eventTime, budget FROM event WHERE eventID = %s;"""
         mycursor.execute(query, (eventID,))
@@ -678,12 +647,7 @@ class InviteWindow(QMainWindow):
         self.ui_inviteEvent.actionlogout.triggered.connect(lambda: logout(self))
         
         try:
-            # print("TRYING")
-            # mycursor.execute(query, (username,), multi=True)
             mycursor.callproc('list_all_invited_to_events', (username,))
-            # query = """SELECT rsvp FROM invitedto WHERE userID = %s AND rsvp = 'Going';"""
-            # mycursor.execute(query, (username, eventID), multi=True)
-            # print(username)
             for result in mycursor.stored_results():
                 events = result.fetchall()
                 if events:
@@ -693,31 +657,6 @@ class InviteWindow(QMainWindow):
                         self.myEvents(name, day, time, eventID)
                 else:
                     print("No events found!")
-            # Check if rows are returned
-            # results = mycursor.stored_results()
-            # print("AFTER RESULTS")
-            # # allEvents = mycursor.fetchall()
-            # for result in results:
-                
-            #     allEvents = result.fetchall()
-            #     print(allEvents)
-            #     if allEvents:
-            #         # print(f"Found {len(allEvents)} events")
-            #         for event in allEvents:
-            #             # print("An INVITE!")  # Debugging message
-            #             # eventID, name, day, time = event
-            #             print(event)
-            #             eventID = event[1]
-            #             query = """SELECT eventName, eventDay, eventTime FROM event WHERE eventID = %s;"""
-            #             mycursor.execute(query, (eventID,))
-                        
-            #             # valid = mycursor.fetchone()
-            #             # print(valid)
-            #             name, day, time = mycursor.fetchone()
-            #             # print(eventID, name, day, time)  # Debugging message
-            #             self.myEvents(name, day, time, eventID)
-            # else:
-            #     print("No events found!")
         except Exception as e:
             print(f"Error: {e}")
         
@@ -843,9 +782,6 @@ class InviteWindow(QMainWindow):
         self.ui_inviteEvent.pushButton_2.clicked.connect(lambda: self.rsvp(eventID, 'Not Going'))
         
     def rsvp(self, eventID, response):
-        # queryName = """SELECT eventName FROM event WHERE eventID = %s;"""
-        # mycursor.execute(queryName, (eventID,))
-        # name = mycursor.fetchone()[0]
         deleteBox = f"eventBox_{eventID}"
         deleteLine = f"line_{eventID}"
         print("DELETING", deleteBox)
@@ -856,8 +792,6 @@ class InviteWindow(QMainWindow):
         myBox.deleteLater()
         myLine = self.findChild(QFrame, deleteLine)
         myLine.deleteLater()
-        # sip.delete(self.widget_name)
-        # self.widget_name = None
 
 def logout(current_page):
     global username, main_app
