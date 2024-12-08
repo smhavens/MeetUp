@@ -135,10 +135,20 @@ class HomepageWindow(QMainWindow):
             print("TRYING")
             
             # Fetch RSVP-related events
-            query = """SELECT eventID FROM invitedto WHERE userID = %s AND rsvp = 'Going';"""
-            mycursor.execute(query, (username,))
-            allEvents = mycursor.fetchall()
-            print("FETCHALL RSVP Events")
+            # query = """SELECT eventID FROM invitedto WHERE userID = %s AND rsvp = 'Going';"""
+            mycursor.callproc("list_all_accepted_invites_for_user", (username,))
+             # Retrieve hosted events
+            for invites in mycursor.stored_results():
+                inviteEvents = invites.fetchall()
+                if inviteEvents:
+                    for event in inviteEvents:
+                        print("Invited to:", event)  # Debugging output
+                        eventID, name, day, time = event
+                        self.myEvents(name, day, time, eventID)
+                else:
+                    print("No hosted events found!")
+            # allEvents = mycursor.fetchall()
+            # print("FETCHALL RSVP Events")
 
             # Call the stored procedure
             mycursor.callproc('list_all_hosted_events_for_user', (username,))
@@ -156,15 +166,15 @@ class HomepageWindow(QMainWindow):
                     print("No hosted events found!")
 
             # Process RSVP-related events
-            if allEvents:
-                for event in allEvents:
-                    eventID = event[0]
-                    query = """SELECT eventName, eventDay, eventTime FROM event WHERE eventID = %s;"""
-                    mycursor.execute(query, (eventID,))
-                    name, day, time = mycursor.fetchone()
-                    self.myEvents(name, day, time, eventID)
-            else:
-                print("No RSVP events found!")
+            # if allEvents:
+            #     for event in allEvents:
+            #         eventID = event[0]
+            #         query = """SELECT eventName, eventDay, eventTime FROM event WHERE eventID = %s;"""
+            #         mycursor.execute(query, (eventID,))
+            #         name, day, time = mycursor.fetchone()
+            #         self.myEvents(name, day, time, eventID)
+            # else:
+            #     print("No RSVP events found!")
         except Exception as e:
             print(f"Error: {e}")
     

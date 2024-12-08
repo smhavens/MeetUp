@@ -1,1 +1,0 @@
-list_all_pending_invites_for_user
